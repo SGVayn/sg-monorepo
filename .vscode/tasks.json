@@ -1,0 +1,108 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "SG: Set up local configuration",
+      "type": "process",
+      "command": "node",
+      "args": ["scripts/setup-dev.mjs"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "SG: Start database",
+      "type": "process",
+      "command": "node",
+      "args": ["scripts/docker.mjs", "compose", "up", "-d", "--wait", "db"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "dependsOn": "SG: Set up local configuration",
+      "problemMatcher": []
+    },
+    {
+      "label": "SG: Apply database migrations",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["run", "--project", "backend/src/Sg.Api", "--", "--migrate"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "dependsOn": "SG: Start database",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "SG: Run frontend",
+      "type": "process",
+      "command": "node",
+      "args": ["node_modules/vite/bin/vite.js"],
+      "options": { "cwd": "${workspaceFolder}/frontend" },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^(.*):(\\d+):(\\d+): (.*)$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "message": 4
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*VITE.*",
+          "endsPattern": ".*Local:.*http.*"
+        }
+      }
+    },
+    {
+      "label": "SG: Run backend",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["watch", "--project", "backend/src/Sg.Api"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "dependsOn": "SG: Apply database migrations",
+      "isBackground": true,
+      "problemMatcher": {
+        "base": "$msCompile",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*Building.*",
+          "endsPattern": ".*Now listening on:.*"
+        }
+      }
+    },
+    {
+      "label": "SG: Start development",
+      "type": "process",
+      "command": "node",
+      "args": ["scripts/dev.mjs"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": {
+        "base": "$msCompile",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*\\[SG\\] Checking.*",
+          "endsPattern": ".*\\[SG\\] Ready:.*"
+        }
+      }
+    },
+    {
+      "label": "SG: Prepare debugging",
+      "dependsOn": ["SG: Apply database migrations", "SG: Run frontend"],
+      "dependsOrder": "sequence",
+      "problemMatcher": []
+    },
+    {
+      "label": "SG: Test backend",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["test", "backend/Sg.slnx"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "SG: Stop database",
+      "type": "process",
+      "command": "node",
+      "args": ["scripts/docker.mjs", "compose", "stop", "db"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    }
+  ]
+}

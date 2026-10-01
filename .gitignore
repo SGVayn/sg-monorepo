@@ -13,6 +13,9 @@ node_modules
 # Build output
 dist
 dist-ssr
+**/bin/
+**/obj/
+**/TestResults/
 
 # Environment variables
 .env
@@ -21,6 +24,7 @@ dist-ssr
 
 # Local config
 *.local
+appsettings.*.local.json
 
 # Test / coverage output
 coverage
@@ -37,6 +41,8 @@ coverage
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+!.vscode/tasks.json
+!.vscode/launch.json
 .idea
 .DS_Store
 

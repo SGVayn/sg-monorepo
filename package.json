@@ -5,6 +5,15 @@
     "node": "24.x"
   },
   "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "setup:dev": "node scripts/setup-dev.mjs",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "dotnet watch --project backend/src/Sg.Api",
+    "db:up": "node scripts/docker.mjs compose up -d --wait db",
+    "db:stop": "node scripts/docker.mjs compose stop db",
+    "db:migrate": "dotnet run --project backend/src/Sg.Api -- --migrate",
+    "build:backend": "dotnet build backend/Sg.slnx",
+    "test:backend": "dotnet test backend/Sg.slnx",
     "typecheck": "npm --prefix frontend run typecheck",
     "lint": "npm --prefix frontend run lint",
     "test": "npm --prefix frontend run test",
